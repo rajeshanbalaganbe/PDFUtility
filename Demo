@@ -1,0 +1,217 @@
+package pdfCompare;
+
+import java.awt.geom.Rectangle2D;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.pdfbox.contentstream.operator.Operator;
+import org.apache.pdfbox.cos.COSArray;
+import org.apache.pdfbox.cos.COSName;
+import org.apache.pdfbox.cos.COSString;
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
+import org.apache.pdfbox.multipdf.Splitter;
+import org.apache.pdfbox.pdfparser.PDFStreamParser;
+import org.apache.pdfbox.pdfwriter.ContentStreamWriter;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.common.PDStream;
+import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.text.PDFTextStripperByArea;
+import org.apache.pdfbox.util.Matrix;
+
+public class MergingPdfs {
+	@SuppressWarnings("deprecation")
+	public static void main(String[] args) throws IOException {
+
+		// Loading an existing PDF document
+		File file1 = new File("E:/PDF/PDFUtility-master/Part1.pdf");
+		PDDocument doc1 = PDDocument.load(file1);
+
+		File file2 = new File("E:/PDF/PDFUtility-master/Part2.pdf");
+		PDDocument doc2 = PDDocument.load(file2);
+
+//		// Loading an existing PDF document
+//
+//		// Instantiating Splitter class
+//		Splitter splitter = new Splitter();
+//
+//		// splitting the pages of a PDF document
+//		List<PDDocument> Pages = splitter.split(doc1);
+//
+//		// Creating an iterator
+//		Iterator<PDDocument> iterator = Pages.listIterator();
+
+//		// Saving each page as an individual document
+//		int i = 1;
+//		while (iterator.hasNext()) {
+//			PDDocument pd = iterator.next();
+//			pd.save("E:/PDF/PDFUtility-master/sample" + i++ + ".pdf");
+//		}
+//		System.out.println("Multiple PDF’s created");
+//		doc1.close();
+
+		// Instantiating PDFMergerUtility class
+		PDFMergerUtility PDFmerger = new PDFMergerUtility();
+
+		// Setting the destination file
+		PDFmerger.setDestinationFileName("E:/PDF/PDFUtility-master/May Weblogic 2020 Release Report.pdf");
+
+		// adding the source files
+		PDFmerger.addSource(file1);
+		PDFmerger.addSource(file2);
+
+		// Merging the two documents
+		PDFmerger.mergeDocuments();
+		System.out.println("Documents merged");
+
+		// Closing the documents
+		doc1.close();
+		doc2.close();
+
+		/**
+		 * 
+		 */
+//		File file3 = new File("E:/PDF/PDFUtility-master/merged.pdf");
+//		try (PDDocument doc = PDDocument.load(file3))
+//		{
+//		    PDFont font = PDType1Font.HELVETICA_BOLD;
+//		    float fontSize = 36.0f;
+//
+//		    for( PDPage page : doc.getPages() )
+//		    {
+//		        PDRectangle pageSize = page.getMediaBox();
+//		        float stringWidth = font.getStringWidth( message )*fontSize/1000f;
+//		        // calculate to center of the page
+//		        int rotation = page.getRotation();
+//		        boolean rotate = rotation == 90 || rotation == 270;
+//		        float pageWidth = rotate ? pageSize.getHeight() : pageSize.getWidth();
+//		        float pageHeight = rotate ? pageSize.getWidth() : pageSize.getHeight();
+//		        float centerX = rotate ? pageHeight/2f : (pageWidth - stringWidth)/2f;
+//		        float centerY = rotate ? (pageWidth - stringWidth)/2f : pageHeight/2f;
+//
+//		        // append the content to the existing stream
+//		        try (PDPageContentStream contentStream = new PDPageContentStream(doc, page, AppendMode.APPEND, true, true))
+//		        {
+//		            contentStream.beginText();
+//		            // set font and font size
+//		            contentStream.setFont( font, fontSize );
+//		            // set text color to red
+//		            contentStream.setNonStrokingColor(255, 0, 0);
+//		            if (rotate)
+//		            {
+//		                // rotate the text according to the page rotation
+//		                contentStream.setTextMatrix(Matrix.getRotateInstance(Math.PI / 2, centerX, centerY));
+//		            }
+//		        }
+//		    }
+//		}
+
+		/**
+		 * 		
+		 */
+
+//		// Rectangle2D region = new Rectangle2D.Double(x,y,width,height);
+//		Rectangle2D region = new Rectangle2D.Double(0, 100, 550, 700);
+//		String regionName = "region";
+//		PDFTextStripperByArea stripper;
+//		PDPage page = doc1.getPage(1);
+//		stripper = new PDFTextStripperByArea();
+//		stripper.addRegion(regionName, region);
+//		stripper.extractRegions(page);
+//		String text = stripper.getTextForRegion(regionName);
+		/**
+		 * 
+		 */
+
+	}
+
+	/**
+	 * 
+	 * PDDocument document = null; document = PDDocument.load(new
+	 * File("E:/PDF/PDFUtility-master/merged.pdf")); document =
+	 * replaceText(document, "1/1", "3/3");
+	 * document.save("E:/PDF/PDFUtility-master/UpdatedMerged.pdf");
+	 * document.close();
+	 * 
+	 * 
+	 */
+	private static PDDocument replaceText(PDDocument document, String searchString, String replacement)
+			throws IOException {
+		if (StringUtils.isEmpty(searchString) || StringUtils.isEmpty(replacement)) {
+			return document;
+		}
+
+		for (PDPage page : document.getPages()) {
+			PDFStreamParser parser = new PDFStreamParser(page);
+			parser.parse();
+			List<?> tokens = parser.getTokens();
+
+			for (int j = 0; j < tokens.size(); j++) {
+				Object next = tokens.get(j);
+				if (next instanceof Operator) {
+					Operator op = (Operator) next;
+
+					String pstring = "";
+					int prej = 0;
+
+					if (op.getName().equals("Tj")) {
+						COSString previous = (COSString) tokens.get(j - 1);
+						String string = previous.getString();
+						string = string.replaceFirst(searchString, replacement);
+						previous.setValue(string.getBytes());
+					} else if (op.getName().equals("TJ")) {
+						COSArray previous = (COSArray) tokens.get(j - 1);
+						for (int k = 0; k < previous.size(); k++) {
+							Object arrElement = previous.getObject(k);
+							if (arrElement instanceof COSString) {
+								COSString cosString = (COSString) arrElement;
+								String string = cosString.getString();
+
+								if (j == prej) {
+									pstring += string;
+								} else {
+									prej = j;
+									pstring = string;
+								}
+							}
+						}
+
+						if (searchString.equals(pstring.trim())) {
+							COSString cosString2 = (COSString) previous.getObject(0);
+							cosString2.setValue(replacement.getBytes());
+
+							int total = previous.size() - 1;
+							for (int k = total; k > 0; k--) {
+								previous.remove(k);
+							}
+						}
+					}
+				}
+			}
+			PDStream updatedStream = new PDStream(document);
+			OutputStream out = updatedStream.createOutputStream(COSName.FLATE_DECODE);
+			ContentStreamWriter tokenWriter = new ContentStreamWriter(out);
+			tokenWriter.writeTokens(tokens);
+			out.close();
+			page.setContents(updatedStream);
+		}
+
+		return document;
+	}
+
+	/**
+	 * PDF to Word
+	 */
+
+	/**
+	 * Class END
+	 */
+}
